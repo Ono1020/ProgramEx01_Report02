@@ -1,0 +1,217 @@
+\usepackage{xcolor}
+\usepackage{fancyhdr} % ヘッダーとフッター
+\usepackage{comment} % コメント
+\usepackage{colortbl} % 表の色付け
+\usepackage{multicol} % 部分的な二段組
+
+% リンク
+\usepackage[
+  setpagesize=false,
+  bookmarks=true,
+  bookmarksdepth=tocdepth,
+  bookmarksnumbered=true,
+  colorlinks=false,
+  pdftitle={},
+  pdfsubject={},
+  pdfauthor={},
+  pdfkeywords={},
+  hidelinks
+]{hyperref}
+
+% 数式使えるよん
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{mathtools}
+\usepackage{amsthm}
+\usepackage{yhmath}
+\mathtoolsset{showonlyrefs=True}
+\usepackage{cancel}
+
+% 定理環境の定義
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}{Lemma}[section]
+\newtheorem{claim}{Claim}[section]
+
+\numberwithin{equation}{section} % 数式番号にsectionを追加
+
+% グラフや図形
+\usepackage{tikz}
+\usetikzlibrary{intersections,calc,arrows.meta,angles}
+
+% 増減表の凹凸矢印
+\newcommand{\ner}{
+  \begin{tikzpicture}[scale=0.3,baseline=0.3]
+    \draw[->,>=stealth] (0,0) to[bend right=45] (1,1);
+  \end{tikzpicture}
+}
+
+\newcommand{\nel}{
+  \begin{tikzpicture}[scale=0.3,baseline=0.3]
+    \draw[->,>=stealth] (0,0) to[bend left=45] (1.2,1);
+  \end{tikzpicture}
+}
+
+\newcommand{\sel}{
+  \begin{tikzpicture}[scale=0.3,baseline=0.3]
+    \draw[->,>=stealth] (0,1) to[bend left=45] (1,0);
+  \end{tikzpicture}
+}
+
+\newcommand{\ser}{
+  \begin{tikzpicture}[scale=0.3,baseline=0.3]
+    \draw[->,>=stealth] (0,1) to[bend right=45] (1.2,0);
+  \end{tikzpicture}
+}
+
+% 媒介変数表示用
+\newcommand{\swr}{
+  \begin{tikzpicture}[scale=0.3,baseline=0.3]
+    \draw[->,>=stealth] (1,1) to[bend right=45] (0,0);
+  \end{tikzpicture}
+}
+
+\newcommand{\swl}{
+  \begin{tikzpicture}[scale=0.3,baseline=0.3]
+    \draw[->,>=stealth] (1.2,1) to[bend left=45] (0,0);
+  \end{tikzpicture}
+}
+
+\newcommand{\nwl}{
+  \begin{tikzpicture}[scale=0.3,baseline=0.3]
+    \draw[->,>=stealth] (1,0) to[bend left=45] (0,1);
+  \end{tikzpicture}
+}
+
+\newcommand{\nwr}{
+  \begin{tikzpicture}[scale=0.3,baseline=0.3]
+    \draw[->,>=stealth] (1.2,0) to[bend right=45] (0,1);
+  \end{tikzpicture}
+}
+
+% 単位のあれこれ
+\usepackage{siunitx}
+
+% 四角枠付き文章
+\usepackage{ascmac}
+\usepackage{fancybox}
+
+% 画像挿入用
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{caption} % 図を横に並べる
+\usepackage[subrefformat=parens]{subcaption}
+\captionsetup{compatibility=false}
+
+% 表関連
+\usepackage{diagbox}
+\usepackage{pict2e}
+\usepackage{multirow} % 表の縦に結合
+
+% 取り消し線用
+\usepackage{ulem}
+
+% ソースコード用
+\usepackage{listings}
+\renewcommand{\lstlistingname}{}
+
+\definecolor{OliveGreen}{rgb}{0.0,0.6,0.0}
+\definecolor{Orange}{rgb}{0.89,0.55,0}
+\definecolor{SkyBlue}{rgb}{0.28, 0.28, 0.95}
+
+\lstset{
+  basicstyle={\ttfamily\scriptsize}, % 使用フォント
+  classoffset=1,
+  identifierstyle={},
+  % commentstyle={},
+  keywordstyle={\bfseries},
+  ndkeywordstyle={},  frame={trBl},
+  % frame={lines},
+  framesep={2pt},
+  breaklines=true,
+  columns=[l]{fullflexible},
+  numbers=left,
+  numberstyle={\tiny},
+  stepnumber=1,
+  tabsize=2,
+  keywordstyle={\color{blue}}, %キーワード(int, ifなど)の書体指定
+  commentstyle={\color{OliveGreen}}, %注釈の書体
+  stringstyle={\color{Orange}}, %文字列
+  showstringspaces=false,  %文字列中の半角スペースを表示させない
+  keepspaces=true,
+}
+
+% PDF結合
+\usepackage{pdfpages}
+
+% % フォント指定
+% \usepackage{xeCJK}
+
+% % Serif
+% \setmainfont[
+%   BoldFont=IBMPlexSerif-Bold.ttf,
+%   ItalicFont=IBMPlexSerif-Italic.ttf,
+%   BoldItalicFont=IBMPlexSerif-BoldItalic.ttf
+% ]{IBMPlexSerif-Regular.ttf}
+
+% \setCJKmainfont[
+%   BoldFont=NotoSerifJP-Bold.otf,
+% ]{NotoSerifJP-Regular.otf}
+
+% % Sans
+% \setsansfont[
+%   BoldFont=NotoSans-Bold.ttf,
+%   ItalicFont=NotoSans-Italic.ttf,
+%   BoldItalicFont=NotoSans-BoldItalic.ttf
+% ]{NotoSans-Regular.ttf}
+
+% \setCJKsansfont[
+%   BoldFont=NotoSansJP-Bold.ttf
+% ]{NotoSansJP-Regular.ttf}
+
+% % Mono
+% \setmonofont[
+%   BoldFont=HackGen-Bold.ttf
+% ]{HackGen-Regular.ttf}
+
+% \setCJKmonofont[
+%   BoldFont=HackGen-Bold.ttf
+% ]{HackGen-Regular.ttf}
+
+% enumerateで二段目を()書きにする
+\renewcommand{\labelenumii}{(\arabic{enumii})}
+
+% タイトル指定
+\newcommand{\TEXTITLE}{2.整数値の入出力と四則演算}
+\newcommand{\TEXAUTHOR}{S2 13番 小野 涼大}
+\newcommand{\TEXDATE}{\today}
+
+% タイトル生成
+\title{\TEXTITLE}
+\author{\TEXAUTHOR}
+\date{\TEXDATE}
+
+% \renewcommand{\thesection}{(\arabic{section})}
+% \renewcommand{\thesubsection}{(\arabic{subsection})}
+% \renewcommand{\thesubsubsection}{(\roman{subsubsection})}
+% \renewcommand{\theparagraph}{(\Roman{paragraph})}
+% \setcounter{secnumdepth}{4}
+
+% \makeatletter
+% \@addtoreset{equation}{section}
+% \@addtoreset{figure}{section}
+% \@addtoreset{table}{section}
+% \makeatother
+
+% \renewcommand{\theequation}{\thesection.\arabic{equation}}
+% \renewcommand{\thefigure}{\thesection.\arabic{figure}}
+% \renewcommand{\thetable}{\thesection.\arabic{table}}
+
+\pagestyle{fancy} % ヘッダー生成
+\lhead{\TEXTITLE} % 左ヘッダー
+\chead{} % 中央ヘッダー
+\rhead{\TEXDATE\hspace{5pt}\TEXAUTHOR} % 右ヘッダー
+\lfoot{}
+\cfoot{\thepage}
+\rfoot{}
+	
