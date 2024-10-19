@@ -193,19 +193,76 @@ int main(void){
 被乗数を割れば実装できそうだがそもそも割り算をどう実装するのか
 あまり思いついていない状況ではある.
 
-\subsection{乗算も繰り返しも使わない実装}
-繰り返しでは実行が遅くなってしまってとても良くない
-(そもそもハードに搭載されているものが最適化されているので
-一番最初の実行方法が最速だと思われるが)
-のでプログラム上で乗算器を再現してみる.
+\subsection{仮想的な乗算器を用いた実装}
+ここからは完全に遊びなのだが
+仮想的な乗算器を実装することによって,
+今回のプログラムを作ってみようと思う.
+ここでは乗算器のみ仮想的に実装するので
+加算等は用いるが許してほしい.
 
+また新たに使用した変数のみ
+変数表にまとめた.
+\begin{table}[h]
+\centering
+\caption{変数表3}
+\label{}
+\begin{tabular}{|c|c|c|c|}
+\hline
+データ & 変数名 & データ型 & 説明  \\ \hline
+入力 & \texttt{a} & int  & 被乗数 \\ \hline
+入力 & \texttt{b} & int  & 乗数  \\ \hline
+内部 & \texttt{bool\_a[32]} & bool  & 被乗数を配列で表現  \\ \hline
+内部 & \texttt{bool\_b[32]} & bool  & 乗数を配列で表現  \\ \hline
+内部 & \texttt{n[32]} & int  & int型整数を配列で表すために使用する  \\ \hline
+\end{tabular}
+\end{table}
 
+2の補数で表された数を式で書くなら以下のようになる.
+\[
+a = -a_{n-1}2^{n-1}+\sum_{i=0}^{n-2}a_i2^i
+\]
+ここで用いている$a_n$は$A$を2進数で表したときの
+$n$bit目の値を表している(そのまま計算してもちゃんと-になるようにしてある).
+この状態で加算を考えるなら以下のようになる.
+\[
+a \cdot b=(-a_{n-1}2^{n-1}+\cdots+a_12^1+a_02^0)(-b_{n-1}2^{n-1}+\cdots+b_12^1+b_02^0)
+\]
+-のつく項をまとめると
+\begin{align*}
+-a_{n-1}b_02^{n-1}+-a_{n-1}b_12^{n}+\cdots+-a_{n-1}b_{n-2}2^{2n-3} \\
+-a_0b_{n-1}2^{n-1}+-a_1b_{n-1}2^{n}+\cdots+-a_{n-2}b_{n-1}2^{2n-3}
+\end{align*}
+となっており, これらは
+「各桁ごとの乗算の最後の値」と「最後の桁の乗算の最後以外の値」
+に分類される.
+これらをif文で条件分岐させ負の数にした後足し合わせることで
+負の数の乗算も実装することができる.
+
+実際に論理回路で実装する場合はビット反転ぐらいしかできないので,
+このマイナスのつく値の部分を桁(後ろの2の指数)がかぶらないようにまとめると
+ちょうどよく2つの組ができることがわかるだろう.
+これらを2の補数で表し計算に組み込むことで実装できる.
+
+いちいち2の補数にするといった動作をしていては効率が悪いので
+一気に計算してみると
+$n+1$bit目と$2n+1$bit目に1が加わることがわかる.
+この1を実装すれば乗算器の完成だ.
+
+C言語上で実装する場合,
+ビット反転をしている方が追加で書く量や
+変数も増えてしまうので
+そのまま単純にマイナスをつけて実装している.
+以下に機能ごとにソースコードを載せる.
+
+\begin{lstlisting}[caption=,label=]
+\end{lstlisting}
 
 \section{所感}
 
 \begin{thebibliography}{9}
-\bibitem{key1} 乗算器, \url{https://ja.wikipedia.org/wiki/%E4%B9%97%E7%AE%97%E5%99%A8}.
-\bibitem{key2} 符号拡張, \url{https://ja.wikipedia.org/wiki/%E7%AC%A6%E5%8F%B7%E6%8B%A1%E5%BC%B5}
+\bibitem{key1} "乗算器". Wikipedia. 2024年6月1日. \url{https://ja.wikipedia.org/wiki/%E4%B9%97%E7%AE%97%E5%99%A8}, (\today).
+\bibitem{key1} "符号付き2進数の乗算". Qiita. 2019年8月18日. \url{https://qiita.com/ryo_i6/items/f665a2267be6ba59c346}, (\today).
+% \bibitem{key2} 符号拡張, \url{https://ja.wikipedia.org/wiki/%E7%AC%A6%E5%8F%B7%E6%8B%A1%E5%BC%B5}
 \end{thebibliography}
 
 \end{document}
