@@ -1,5 +1,5 @@
 \documentclass[a4paper, xelatex, ja=standard]{bxjsarticle}
-\setpagelayout*{top=25truemm,bottom=25truemm,left=25truemm,right=25truemm}
+% \setpagelayout*{top=25truemm,bottom=25truemm,left=25truemm,right=25truemm}
 
 % パッケージインストール
 \usepackage{plisting}
@@ -36,9 +36,9 @@
 \section{設計}
 今回作成するプログラムのフローチャートを以下に示す.
 
-\begin{figure}[h]
+\begin{figure}[H]
 \centering
-\includegraphics[scale=0.5]{../img/flowchart.drawio.png}
+\includegraphics[scale=0.4]{../img/flowchart.drawio.png}
 \caption{フローチャート}
 \label{}
 \end{figure}
@@ -97,7 +97,8 @@ int main(void){
 
 \section{検証}
 実行結果は以下の通りである.
-
+実行環境は前回と異なり, 
+ArchLinuxで実行した.
 \begin{figure}[h]
 \centering
 \includegraphics[scale=1.0]{../img/terminal_result.png}
@@ -105,10 +106,12 @@ int main(void){
 \label{}
 \end{figure}
 
-実行環境は前回と異なり, 
-ChromeBookにArchLinuxを入れたもので実行した.
-
 \section{考察}
+問題設定の通りのプログラムを書くことができた.
+次にこのプログラムに対してバグを発生させる余地が残っているので
+そちらを調べることと,
+別の実装方法について考えてみた.
+
 \subsection{オーバーフローさせてみる}
 私の使用しているものも
 \texttt{int}型のサイズは32bitのため
@@ -139,15 +142,17 @@ ChromeBookにArchLinuxを入れたもので実行した.
 表現できる最大値の次の値は表現できる最小値になることを
 改めて確認することができた.
 
-% このバグを改善する方法としては
-% パワープレイであれば使うbit数を増やせば良いが,
-% 少し工夫をするのであれ
+これを回避するのであれば
+\texttt{a}, \texttt{b}の符号を何らかの形で保存しておき
+演算結果と符号を保存した変数の組み合わせを比べる.
+もし演算結果の符号が正しくなければ「オーバーフローしました」
+などと表示し再度入力を求めることで
+このバグを回避することができるだろう.
 
 \subsection{乗算を使わない実装}
-この授業とは関係ないが計算機アーキテクチャで
-「掛け算は足し算の繰り返しで実装できる」
-ということを聞いたので,
-足し算を繰り返すver.を作ってみた.
+乗算を使わずとも加算の繰り返しで
+乗算と同じことをできるので,
+加算の繰り返しによる実装を行った.
 尚, 繰り返しの記述方法は既に知っていたので
 参考文献には記述していない.
 \begin{lstlisting}[caption=加算のみでの実装,label=]
@@ -214,6 +219,9 @@ int main(void){
 内部 & \texttt{bool\_a[32]} & bool  & 被乗数を配列で表現  \\ \hline
 内部 & \texttt{bool\_b[32]} & bool  & 乗数を配列で表現  \\ \hline
 内部 & \texttt{n[32]} & int  & int型整数を配列で表すために使用する  \\ \hline
+出力 & \texttt{p} & int  & 演算結果を格納する  \\ \hline
+内部 & \texttt{q} & int  & 各桁ごとの演算結果を格納する  \\ \hline
+内部 & \texttt{r} & int  & 桁同士の演算結果を格納する(イメージとしては\texttt{q}の手前)  \\ \hline
 \end{tabular}
 \end{table}
 
@@ -227,7 +235,7 @@ $n$bit目の値を表している(そのまま計算してもちゃんと-にな
 \[
 a \cdot b=(-a_{n-1}2^{n-1}+\cdots+a_12^1+a_02^0)(-b_{n-1}2^{n-1}+\cdots+b_12^1+b_02^0)
 \]
--のつく項をまとめると
+マイナスのつく項をまとめると
 \begin{align*}
 -a_{n-1}b_02^{n-1}+-a_{n-1}b_12^{n}+\cdots+-a_{n-1}b_{n-2}2^{2n-3} \\
 -a_0b_{n-1}2^{n-1}+-a_1b_{n-1}2^{n}+\cdots+-a_{n-2}b_{n-1}2^{2n-3}
@@ -254,10 +262,105 @@ C言語上で実装する場合,
 そのまま単純にマイナスをつけて実装している.
 以下に機能ごとにソースコードを載せる.
 
-\begin{lstlisting}[caption=,label=]
+最初にヘッダファイルの読み込みと
+\texttt{main}関数を始めている.
+\begin{lstlisting}[caption=最初の部分,label=]
+#include <stdio.h>
+#include <stdbool.h> // bool型を使えるようにする
+
+int main(void){
 \end{lstlisting}
+\texttt{stdbool.h}を読み込むことで
+\texttt{bool}型を使用できるようにしている.
+
+次に入力された値を\texttt{bool}型の配列で
+2進数として表現する.
+\begin{lstlisting}[caption=\texttt{bool}型の配列で表す,label=]
+// int型の変数を配列で表現するために使う変数の用意
+int n[32];
+for(int i=0; i<32; i++){
+	n[i] = 1 << i;
+}
+
+
+// 入力値の保存
+int a, b; // a: 被乗数 b: 乗数
+printf("被乗数と乗数を入力して下さい\n");
+printf("被乗数:");
+scanf("%d", &a);
+printf("乗数:");
+scanf("%d", &b);
+
+
+// bool型のa, b
+bool bool_a[32], bool_b[32];
+
+// aを配列で表現
+for(int i=0; i < 32; i++){
+	bool_a[i] = (a & n[i]) != 0;
+}
+
+// bを配列で表現
+for(int i=0; i < 32; i++){
+	bool_b[i] = (b & n[i]) != 0;
+}
+\end{lstlisting}
+まず各bitごとに一つだけ1になっている
+\texttt{int}型の配列\texttt{n}を用意する.
+それらと\texttt{a}, \texttt{b}の論理和を取り
+真だったとき配列のその場所を真, 偽であれば偽にする.
+そうすることで\texttt{bool}型の配列で
+\texttt{int}型の入力を表すことができる.
+
+次に乗算している部分のコードを載せる.
+\begin{lstlisting}[caption=乗算部,label=]
+// 乗算に関する変数
+int p=0, q, r; // p: 演算結果の保存 q: 各桁の合計 r: 各桁同士の演算結果の保存
+for(int i=0; i < 32; i++){
+	q=0;
+	for(int j=0; j < 32; j++){
+		r = ((int)(bool_a[i] && bool_b[j])) << j;
+		// 各桁の最後の値or最後のbの最後のa以外を負の数にする
+		if((j == 31 && i != 31) || (j != 31 && i == 31)){
+			r = -r;
+		}
+		q += r;
+	}
+	q = q << i;
+	p += q;
+}
+\end{lstlisting}
+こちらではさきほど説明した演算方法を実行している.
+各桁の論理積をとりその桁に合わせてビットシフトし
+足しあわしている.
+また負の数にも対応するために8行目のところで
+条件分岐を入れ調節している.
+
+最後に演算結果を出力している.
+\begin{lstlisting}[caption=出力部,label=]
+// 乗算結果の出力
+printf("%d x %d = %d\n", a, b, p);
+
+return 0;
+\end{lstlisting}
+これはソースコード\ref{s01}の出力部と
+ほぼ一緒である.
 
 \section{所感}
+前回と違い2週間ほど時間もあり,
+また土日も時間があったので
+別の実装方法として色々考えてみた.
+乗算器についてはもともと気になっていたので,
+この機会に学習することができて良かった.
+
+ただこれが本当に正しいのか確かめるために
+総当りで普通に乗算したときの結果と比較することで,
+ミスがないか確認している.
+しかし, よくよく考えてみると$50\mbox{億}\times50\mbox{億}$程度の
+計算量になっておりとても時間がかかっており, まだ終わっていない.
+始めてしまったものは仕方ないのでしばらく動かしてみることにする.
+他にいい方法があればそちらに切り替えようと考えているが,
+今の所思いつかないので提出までに計算が終わればこちらに追記しておく.
 
 \begin{thebibliography}{9}
 \bibitem{key1} "乗算器". Wikipedia. 2024年6月1日. \url{https://ja.wikipedia.org/wiki/%E4%B9%97%E7%AE%97%E5%99%A8}, (\today).
